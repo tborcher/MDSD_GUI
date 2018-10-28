@@ -1,0 +1,14 @@
+App.config
+<< Form >>.cs --> EventHandler
+<< Form >>.Designer.cs --> Generated Files
+<< Form >>.resx --> ???
+Program.cs --> Main-Method
+<< ProjectName >>.csproj
+Properties\AssemblyInfo.cs
+Properties\Resources.Designer.cs
+Properties\Resources.resx
+Properties\Settings.Designer.cs
+Properties\Settings.settings
+
+<< ProjectName >> :: WindowsFormsApp1
+<< Form >> :: Form1

@@ -1,0 +1,9 @@
+grammar org.xtext.GUI_Language with org.eclipse.xtext.common.Terminals
+
+generate gUI_Language "http://www.xtext.org/GUI_Language"
+
+Model:
+	greetings+=Greeting*;
+	
+Greeting:
+	'Hello' name=ID '!';

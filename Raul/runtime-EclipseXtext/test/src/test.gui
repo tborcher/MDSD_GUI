@@ -1,0 +1,21 @@
+GUI myGUI
+Titel "coolGUI"
+Heigth 200
+Width 400
+Button klickMich{
+	callback "klickMichCallback"
+	text "Klick Mich"
+	left 20
+	top 20
+	heigth 20
+	width 20
+}
+
+TextLabel myLabel{
+	callback "myLabelCallback"
+	text "label"
+	left 20
+	top 50
+	heigth 10
+	width 200
+}

@@ -1,0 +1,50 @@
+grammar gui_proj.GUI with org.eclipse.xtext.common.Terminals
+
+generate gUI "http://www.GUI.gui_proj"
+
+Gui :
+    "GUI" name=ID
+    "Titel" titel=STRING
+    "Heigth" height=INT
+    "Width" width=INT
+    (guiObjects+=GUIElement)*;
+    
+    
+    
+    
+GUIElement:
+    TextLabel | InputField | Button | RadioButton | CheckBox;
+
+
+
+GUIElementDescription:
+        "callback" callback=STRING
+        "text" text=STRING
+        "left" left=INT
+        "top" top=INT
+        "heigth" heigth =INT
+        "width" width=INT;
+        
+
+TextLabel:
+	'TextLabel' name=ID '{'
+		textLabelDescription=GUIElementDescription
+	'}';
+	
+	
+InputField:
+	'InputField' name=ID '{'
+		inputFieldDescription=GUIElementDescription
+	'}';
+Button:
+	'Button' name=ID '{'
+		buttonDescription=GUIElementDescription
+	'}';
+RadioButton:
+	'RadioButton' name=ID '{'
+		radioButtonDescription=GUIElementDescription
+	'}';
+CheckBox:
+	'CheckBox' name=ID '{'
+		checkBoxDescription=GUIElementDescription
+	'}';

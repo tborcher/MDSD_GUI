@@ -3,10 +3,19 @@
  */
 package gui_proj.generator;
 
+import com.google.common.collect.Iterables;
+import gui_proj.gUI.Gui;
+import javax.inject.Inject;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.xtend2.lib.StringConcatenation;
 import org.eclipse.xtext.generator.AbstractGenerator;
 import org.eclipse.xtext.generator.IFileSystemAccess2;
 import org.eclipse.xtext.generator.IGeneratorContext;
+import org.eclipse.xtext.naming.IQualifiedNameProvider;
+import org.eclipse.xtext.naming.QualifiedName;
+import org.eclipse.xtext.xbase.lib.Extension;
+import org.eclipse.xtext.xbase.lib.IteratorExtensions;
 
 /**
  * Generates code from your model files on save.
@@ -15,7 +24,45 @@ import org.eclipse.xtext.generator.IGeneratorContext;
  */
 @SuppressWarnings("all")
 public class GUIGenerator extends AbstractGenerator {
+  @Inject
+  @Extension
+  private IQualifiedNameProvider _iQualifiedNameProvider;
+  
   @Override
   public void doGenerate(final Resource resource, final IFileSystemAccess2 fsa, final IGeneratorContext context) {
+    Iterable<Gui> _filter = Iterables.<Gui>filter(IteratorExtensions.<EObject>toIterable(resource.getAllContents()), Gui.class);
+    for (final Gui e : _filter) {
+      String _string = this._iQualifiedNameProvider.getFullyQualifiedName(e).toString("/");
+      String _plus = (_string + ".java");
+      fsa.generateFile(_plus, 
+        this.compile(e));
+    }
+  }
+  
+  public CharSequence compile(final Gui g) {
+    StringConcatenation _builder = new StringConcatenation();
+    {
+      QualifiedName _fullyQualifiedName = this._iQualifiedNameProvider.getFullyQualifiedName(g.eContainer());
+      boolean _tripleNotEquals = (_fullyQualifiedName != null);
+      if (_tripleNotEquals) {
+        _builder.append("package ");
+        QualifiedName _fullyQualifiedName_1 = this._iQualifiedNameProvider.getFullyQualifiedName(g.eContainer());
+        _builder.append(_fullyQualifiedName_1);
+        _builder.append(";");
+        _builder.newLineIfNotEmpty();
+      }
+    }
+    _builder.append("    ");
+    _builder.newLine();
+    _builder.append("public class ");
+    String _name = g.getName();
+    _builder.append(_name);
+    _builder.append(" {");
+    _builder.newLineIfNotEmpty();
+    _builder.append("\t");
+    _builder.newLine();
+    _builder.append("}");
+    _builder.newLine();
+    return _builder;
   }
 }

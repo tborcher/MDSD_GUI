@@ -7,6 +7,10 @@ import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
+import gui_proj.gUI.*
+import org.eclipse.xtext.naming.IQualifiedNameProvider
+import javax.inject.Inject
+import gui_proj.gUI.Gui
 
 /**
  * Generates code from your model files on save.
@@ -14,12 +18,34 @@ import org.eclipse.xtext.generator.IGeneratorContext
  * See https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#code-generation
  */
 class GUIGenerator extends AbstractGenerator {
+	
+	@Inject extension IQualifiedNameProvider
+
+
 
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
-//		fsa.generateFile('greetings.txt', 'People to greet: ' + 
-//			resource.allContents
-//				.filter(Greeting)
-//				.map[name]
-//				.join(', '))
+		
+		
+		for (e : resource.allContents.toIterable.filter(Gui)) {
+			fsa.generateFile(
+            e.fullyQualifiedName.toString("/") + ".java",
+            e.compile)
+                
+        }
+		
+		
+		
+		
 	}
+	
+	def compile(Gui g) ''' 
+    «IF g.eContainer.fullyQualifiedName !== null»
+        package «g.eContainer.fullyQualifiedName»;
+    «ENDIF»
+        
+    public class «g.name» {
+    	
+    }
+'''
+	
 }

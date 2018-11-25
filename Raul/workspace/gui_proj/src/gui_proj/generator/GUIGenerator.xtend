@@ -9,14 +9,11 @@ import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
 import gui_proj.gUI.*
 import org.eclipse.xtext.naming.IQualifiedNameProvider
-import javax.inject.Inject
+//import javax.inject.Inject
+import com.google.inject.Inject
 import gui_proj.gUI.Gui
 
-/**
- * Generates code from your model files on save.
- * 
- * See https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#code-generation
- */
+
 class GUIGenerator extends AbstractGenerator {
 	
 	@Inject extension IQualifiedNameProvider
@@ -24,19 +21,15 @@ class GUIGenerator extends AbstractGenerator {
 
 
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
-		
-		
-		for (e : resource.allContents.toIterable.filter(Gui)) {
+		for (g : resource.allContents.toIterable.filter(Gui)) {
 			fsa.generateFile(
-            e.fullyQualifiedName.toString("/") + ".java",
-            e.compile)
+            g.fullyQualifiedName.toString("/") + ".java",
+            g.compile)
                 
         }
-		
-		
-		
-		
 	}
+	
+	
 	
 	def compile(Gui g) ''' 
     «IF g.eContainer.fullyQualifiedName !== null»

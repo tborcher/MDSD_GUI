@@ -4,8 +4,8 @@
 package gui_proj.generator;
 
 import com.google.common.collect.Iterables;
+import com.google.inject.Inject;
 import gui_proj.gUI.Gui;
-import javax.inject.Inject;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtend2.lib.StringConcatenation;
@@ -17,11 +17,6 @@ import org.eclipse.xtext.naming.QualifiedName;
 import org.eclipse.xtext.xbase.lib.Extension;
 import org.eclipse.xtext.xbase.lib.IteratorExtensions;
 
-/**
- * Generates code from your model files on save.
- * 
- * See https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#code-generation
- */
 @SuppressWarnings("all")
 public class GUIGenerator extends AbstractGenerator {
   @Inject
@@ -31,11 +26,11 @@ public class GUIGenerator extends AbstractGenerator {
   @Override
   public void doGenerate(final Resource resource, final IFileSystemAccess2 fsa, final IGeneratorContext context) {
     Iterable<Gui> _filter = Iterables.<Gui>filter(IteratorExtensions.<EObject>toIterable(resource.getAllContents()), Gui.class);
-    for (final Gui e : _filter) {
-      String _string = this._iQualifiedNameProvider.getFullyQualifiedName(e).toString("/");
+    for (final Gui g : _filter) {
+      String _string = this._iQualifiedNameProvider.getFullyQualifiedName(g).toString("/");
       String _plus = (_string + ".java");
       fsa.generateFile(_plus, 
-        this.compile(e));
+        this.compile(g));
     }
   }
   

@@ -25,25 +25,25 @@ GUIElementDescription:
 
 TextLabel:
 	'TextLabel' name=ID '{'
-		textLabelDescription=GUIElementDescription
+		(description=GUIElementDescription)
 	'}';
 	
 	
 InputField:
 	'InputField' name=ID '{'
-		inputFieldDescription=GUIElementDescription
+		description=GUIElementDescription
 	'}';
 Button:
 	'Button' name=ID '{'
-		buttonDescription=GUIElementDescription
+		description=GUIElementDescription
 	'}';
 RadioButton:
 	'RadioButton' name=ID '{'
-		radioButtonDescription=GUIElementDescription
+		description=GUIElementDescription
 	'}';
 CheckBox:
 	'CheckBox' name=ID '{'
-		checkBoxDescription=GUIElementDescription
+		description=GUIElementDescription
 	'}';
 		
 		

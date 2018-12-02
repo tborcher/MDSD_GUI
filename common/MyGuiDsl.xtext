@@ -20,7 +20,9 @@ GUIElement:
 GUIElementDescription:
         "text" text=STRING
         "left" left=INT
-        "top" top=INT;
+        "top" top=INT
+        ("width" width=INT)?
+        ("height" height=INT)?;
         
 
 TextLabel:

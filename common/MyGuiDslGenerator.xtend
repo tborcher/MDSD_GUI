@@ -27,6 +27,7 @@ class MyGuiDslGenerator extends AbstractGenerator {
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
 		for (g : resource.allContents.toIterable.filter(Gui)) {
 			var isCS = g.target == "WinForms" || g.target == "Both"
+			var isA3 = g.target == "AutoIt" || g.target == "Both"
 			var fqn = g.fullyQualifiedName.toString("/")
 			if(isA3) {
 				guiFileName = "genGUI_" + g.fullyQualifiedName.toString("/") + ".au3"//why fullyqulified name? g.name geht auch?
@@ -216,7 +217,7 @@ namespace «g.fullyQualifiedName» {
 			«ENDFOR»
 			this.SuspendLayout();
 			«FOR e : g.guiObjects SEPARATOR '\n' AFTER '\n'»
-				«e.createMember_cs»
+				«e.createMember_cs(e.description)»
 			«ENDFOR»
 «««			/// Outsourced for convenience, but I guess this can be moved into her as well.
 			«g.createGUI»
@@ -232,23 +233,22 @@ namespace «g.fullyQualifiedName» {
 	}
 }'''
 
-
-def createMember_cs(GUIElement e)'''«««//{ Folding mark
+def createMember_cs(GUIElement e, GUIElementDescription gd) '''//{
 // 
 // «e.name»
 // 
 «««	// Label, CheckBox --> Will discard ".Size" (?)
 this.«e.name».AutoSize = true;
-«««	// Button, TextBox, RadioButton, Label, CheckBox
-this.«e.name».Location = new System.Drawing.Point(«e.left», «e.top»);
 «««	// Button, TextBox, RadioButton, Label, CheckBox (this is required, I think)
 this.«e.name».Name = "«e.name»";
 «««	// Button, TextBox, RadioButton, Label, CheckBox
+this.«e.name».Location = new System.Drawing.Point(«gd.left», «gd.top»);
+«««	// Button, TextBox, RadioButton, Label, CheckBox
 «««		/// Does Size regenerate based on ".Text" if missing?
-this.«e.name».Size = new System.Drawing.Size(«e.width», «e.height»);
+this.«e.name».Size = new System.Drawing.Size(«gd.width», «gd.height»);
 «««	// Button, TextBox, RadioButton, Label, CheckBox
 «««		/// Running number over all elements; Is that really required or implicit from VS?
-this.«e.name».TabIndex = SEQNO;
+//this.«e.name».TabIndex = SEQNO;
 «««	// Button, RadioButton, Label, CheckBox
 «««	this.«e.name».Text = "«e.display»";
 «««	// Button, CheckBox
@@ -258,7 +258,8 @@ this.«e.name».UseVisualStyleBackColor = true;
 «««		foreach(h in e.handler) do
 «««			this.«e.name».«h.type» += new System.EventHandler(this.«h.name»);
 this.Controls.Add(this.«e.name»);
-'''//} Folding mark
+'''//} Folding mark1
+
 /* Define Member "e" as
 --	name    :str: VariableName >> default: ToLowercase(class) + SEQNO
 --	class   :str: Button	or	System.Windows.Forms.Button, if using does not work.
@@ -296,14 +297,5 @@ this.Text = "«g.name»";
 
 
 
-
-
 }
-
-
-
-
-
-
-	
 

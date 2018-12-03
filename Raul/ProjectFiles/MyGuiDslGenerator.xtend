@@ -21,17 +21,16 @@ class MyGuiDslGenerator extends AbstractGenerator {
 
 	@Inject extension IQualifiedNameProvider
 
-
+	var callbacksFileName = ""
+	var guiFileName = ""
 
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
 		for (g : resource.allContents.toIterable.filter(Gui)) {
-			fsa.generateFile(
-            "genGUI_" + g.fullyQualifiedName.toString("/") + ".au3",
-            g.compile)
+			guiFileName = "genGUI_" + g.fullyQualifiedName.toString("/") + ".au3"//wofür fullyqulified name? g.name geht auch?
+			callbacksFileName = "callbacks_" + g.fullyQualifiedName.toString("/") + ".au3"
+			fsa.generateFile(guiFileName,g.compile)
             
-            fsa.generateFile(
-            "callbacks_" + g.fullyQualifiedName.toString("/") + ".au3",
-            "hallo")
+            fsa.generateFile(callbacksFileName, callbacks(g))
             
         }
 	}
@@ -57,11 +56,6 @@ class MyGuiDslGenerator extends AbstractGenerator {
 	
 	_initGUI()
 	
-	
-	;~ Variablen müssen einzigartig sein, damit sie bei der implementierung nicht vergeben sind. oder vom Benutzer definiert!
-	
-	;~ _UserFuncBeforeGUIStart
-	
 	GUISetState(@SW_SHOW)
 	
 	While 1
@@ -70,77 +64,126 @@ class MyGuiDslGenerator extends AbstractGenerator {
 			Case $GUI_EVENT_CLOSE
 				Exit
 	
-			Case $GUI_EVENT_MINIMIZE
-	
-			Case $GUI_EVENT_RESTORE
-	
-			Case $GUI_EVENT_MAXIMIZE
-	
-			Case $GUI_EVENT_MOUSEMOVE
-	
-			Case $GUI_EVENT_PRIMARYDOWN
-	
-			Case $GUI_EVENT_PRIMARYUP
-	
-			Case $GUI_EVENT_SECONDARYDOWN
-	
-			Case $GUI_EVENT_SECONDARYUP
-	
-			Case $GUI_EVENT_RESIZED
-	
-			Case $GUI_EVENT_DROPPED
-	
-	
-	
-	
-	
-			Case $Button1
-				_Button1Func()
-			Case $Input1
-	
-			Case $idRadio_1 To $idRadio_3
-				_RadioFunc($nMsg - $idRadio_1)
-				;~ GUIGetMsg radiobutton beispiel
-				;~ GUICtrlCreateGroup
-				;~ GUIStartGroup
-	
-			Case $Checkbox1
-				_Checkbox1Func()
-	
+	«FOR e : g.guiObjects»«
+		IF e instanceof InputField»«ELSE»		Case $«e.name»
+				_«e.name»Func()
+	«ENDIF»«ENDFOR»
 	
 		EndSwitch
 	
-		;~ _UserFuncWhileGUIRunning   Das würde Blockieren!  evtl lösung
-	
 	WEnd
 	
-	
-	
-	
-	
-	
-	
+
 	
 	Func _initGUI()
-		$Form1 = GUICreate("Form1", 350, 250, 200, 200)
-		$Button1 = GUICtrlCreateButton("TestInputBox", 80, 140, 75, 25)
-		$Input1 = GUICtrlCreateInput("Input1", 80, 110, 121, 21)
-		$idRadio_1 = GUICtrlCreateRadio("Radio &0", 180, 20)
-		             GUICtrlCreateRadio("Radio &1", 180, 50)
-		$idRadio_3 = GUICtrlCreateRadio("Radio &2", 180, 80)
-		$Label1 = GUICtrlCreateLabel("Label1", 100, 10, 36, 17)
-		$Checkbox1 = GUICtrlCreateCheckbox("Checkbox1", 80, 30, 97, 17)
+		$«g.name» = GUICreate("«g.titel»", «g.width», «g.height»)
+	«FOR e : g.guiObjects»	«e.compile»
+	«ENDFOR»EndFunc
+	'''
+		
+		
+		
+		
+	
+	//create GUIElements in initGUI
+	def compile(GUIElement gE) '''«switch gE {
+	TextLabel:   _initGUI_TextLabel(gE)
+	InputField:  _initGUI_InputField(gE)
+	Button:      _initGUI_Button(gE)
+	RadioButton: _initGUI_RadioButton(gE)
+	CheckBox:    _initGUI_CheckBox(gE)
+	default: 'ERROR'
+	}»'''	
+	
+	
+	def String _initGUI_TextLabel(GUIElement gE){
+		val d = (gE as TextLabel).description
+		return "$" + gE.name + " = GUICtrlCreateLabel(\"" + d.text + "\", " + d.left + ", " + d.top + optionalWidthHeight(d) + ")"
+	}
+	
+	
+	def String _initGUI_InputField(GUIElement gE){
+		val d = (gE as InputField).description
+		return "$" + gE.name + " = GUICtrlCreateInput(\"" + d.text + "\", " + d.left + ", " + d.top + optionalWidthHeight(d) + ")"
+	}
+	
+	def String _initGUI_Button(GUIElement gE){
+		val d = (gE as Button).description
+		return "$" + gE.name + " = GUICtrlCreateButton(\"" + d.text + "\", " + d.left + ", " + d.top + optionalWidthHeight(d) + ")"
+	}
+	
+	def String _initGUI_RadioButton(GUIElement gE){
+		val d = (gE as RadioButton).description
+		return "$" + gE.name + " = GUICtrlCreateRadio(\"" + d.text + "\", " + d.left + ", " + d.top + optionalWidthHeight(d) + ")"
+	}
+	
+	def String _initGUI_CheckBox(GUIElement gE){
+		val d = (gE as CheckBox).description
+		return "$" + gE.name + " = GUICtrlCreateCheckbox(\"" + d.text + "\", " + d.left + ", " + d.top + optionalWidthHeight(d) + ")"
+	}
+	
+	def String optionalWidthHeight(GUIElementDescription gED){
+		var ret = ""
+		
+		if((gED.width == 0)&&(gED.height == 0)){
+		}else if((gED.width != 0)&&(gED.height == 0)){
+			ret += ", " +  gED.width
+		}else if((gED.width != 0)&&(gED.height != 0)){
+			ret += ", " +  gED.width + ", " +  gED.height
+		}else if((gED.width == 0)&&(gED.height != 0)){
+			ret += ", Default, " +  gED.height
+		}
+		
+		ret
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//===================================Callbacks==========================================================================
+
+	def callbacks(Gui g) '''
+	#include <MsgBoxConstants.au3>
+	#include "«guiFileName»"
+	
+	«FOR e : g.guiObjects»«
+			IF e instanceof InputField»«ELSE»Func _«e.name»Func()
+		MsgBox($MB_SYSTEMMODAL, "«e.name»", "«e.name»")
 	EndFunc
 	
+	«ENDIF»«ENDFOR»
+	'''
 
 
 
 
 
 
-
-'''
-	
 }
 
 

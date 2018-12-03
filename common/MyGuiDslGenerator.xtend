@@ -29,7 +29,7 @@ class MyGuiDslGenerator extends AbstractGenerator {
 			var isCS = g.target == "WinForms" || g.target == "Both"
 			var fqn = g.fullyQualifiedName.toString("/")
 			if(isA3) {
-				guiFileName = "genGUI_" + g.fullyQualifiedName.toString("/") + ".au3"//wofE fullyqulified name? g.name geht auch?
+				guiFileName = "genGUI_" + g.fullyQualifiedName.toString("/") + ".au3"//why fullyqulified name? g.name geht auch?
 				callbacksFileName = "callbacks_" + g.fullyQualifiedName.toString("/") + ".au3"
 				fsa.generateFile(guiFileName,g.compile)
 				fsa.generateFile(callbacksFileName, callbacks(g))
@@ -58,7 +58,7 @@ class MyGuiDslGenerator extends AbstractGenerator {
 	#include <StaticConstants.au3>
 	#EndRegion END include
 	
-	Global «FOR e : g.guiObjects SEPARATOR ',' AFTER '\n'»$«e.name»«ENDFOR»
+	Global Â«FOR e : g.guiObjects SEPARATOR ',' AFTER '\n'Â»$Â«e.nameÂ»Â«ENDFORÂ»
 	
 	_initGUI()
 	
@@ -70,10 +70,10 @@ class MyGuiDslGenerator extends AbstractGenerator {
 			Case $GUI_EVENT_CLOSE
 				Exit
 	
-	«FOR e : g.guiObjects»«
-		IF e instanceof InputField»«ELSE»		Case $«e.name»
-				_«e.name»Func()
-	«ENDIF»«ENDFOR»
+	Â«FOR e : g.guiObjectsÂ»Â«
+		IF e instanceof InputFieldÂ»Â«ELSEÂ»		Case $Â«e.nameÂ»
+				_Â«e.nameÂ»Func()
+	Â«ENDIFÂ»Â«ENDFORÂ»
 	
 		EndSwitch
 	
@@ -82,24 +82,19 @@ class MyGuiDslGenerator extends AbstractGenerator {
 
 	
 	Func _initGUI()
-		$«g.name» = GUICreate("«g.titel»", «g.width», «g.height»)
-	«FOR e : g.guiObjects»	«e.compile»
-	«ENDFOR»EndFunc
+		$Â«g.nameÂ» = GUICreate("Â«g.titelÂ»", Â«g.widthÂ», Â«g.heightÂ»)
+	Â«FOR e : g.guiObjectsÂ»	Â«e.compileÂ»
+	Â«ENDFORÂ»EndFunc
 	'''
-		
-		
-		
-		
-	
 	//create GUIElements in initGUI
-	def compile(GUIElement gE) '''«switch gE {
+	def compile(GUIElement gE) '''Â«switch gE {
 	TextLabel:   _initGUI_TextLabel(gE)
 	InputField:  _initGUI_InputField(gE)
 	Button:      _initGUI_Button(gE)
 	RadioButton: _initGUI_RadioButton(gE)
 	CheckBox:    _initGUI_CheckBox(gE)
 	default: 'ERROR'
-	}»'''	
+	}Â»'''
 	
 	
 	def String _initGUI_TextLabel(GUIElement gE){
@@ -175,14 +170,14 @@ class MyGuiDslGenerator extends AbstractGenerator {
 
 	def callbacks(Gui g) '''
 	#include <MsgBoxConstants.au3>
-	#include "«guiFileName»"
+	#include "Â«guiFileNameÂ»"
 	
-	«FOR e : g.guiObjects»«
-			IF e instanceof InputField»«ELSE»Func _«e.name»Func()
-		MsgBox($MB_SYSTEMMODAL, "«e.name»", "«e.name»")
+	Â«FOR e : g.guiObjectsÂ»Â«
+			IF e instanceof InputFieldÂ»Â«ELSEÂ»Func _Â«e.nameÂ»Func()
+		MsgBox($MB_SYSTEMMODAL, "Â«e.nameÂ»", "Â«e.nameÂ»")
 	EndFunc
 	
-	«ENDIF»«ENDFOR»
+	Â«ENDIFÂ»Â«ENDFORÂ»
 	'''
 
 

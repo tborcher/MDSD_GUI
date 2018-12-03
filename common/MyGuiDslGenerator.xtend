@@ -240,12 +240,12 @@ def createMember_cs(GUIElement e)'''«««//{ Folding mark
 «««	// Label, CheckBox --> Will discard ".Size" (?)
 this.«e.name».AutoSize = true;
 «««	// Button, TextBox, RadioButton, Label, CheckBox
-«««this.«e.name».Location = new System.Drawing.Point(«e.left», «e.top»);
+this.«e.name».Location = new System.Drawing.Point(«e.left», «e.top»);
 «««	// Button, TextBox, RadioButton, Label, CheckBox (this is required, I think)
 this.«e.name».Name = "«e.name»";
 «««	// Button, TextBox, RadioButton, Label, CheckBox
 «««		/// Does Size regenerate based on ".Text" if missing?
-«««this.«e.name».Size = new System.Drawing.Size(«e.width», «e.height»);
+this.«e.name».Size = new System.Drawing.Size(«e.width», «e.height»);
 «««	// Button, TextBox, RadioButton, Label, CheckBox
 «««		/// Running number over all elements; Is that really required or implicit from VS?
 this.«e.name».TabIndex = SEQNO;

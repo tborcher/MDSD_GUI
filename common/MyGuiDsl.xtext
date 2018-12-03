@@ -5,8 +5,8 @@ generate myGuiDsl "http://www.MyGuiDsl.gui_proj"
 Gui :
     "GUI" name=ID
     "Titel" titel=STRING
-    "Heigth" height=INT
     "Width" width=INT
+    "Heigth" height=INT
     (guiObjects+=GUIElement)*;
     
     

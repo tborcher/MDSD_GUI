@@ -4,14 +4,16 @@ generate myGuiDsl "http://www.MyGuiDsl.gui_proj"
 
 Gui :
     "GUI" name=ID
+    "Target" target=TargetEnum
     "Titel" titel=STRING
     "Width" width=INT
     "Heigth" height=INT
     (guiObjects+=GUIElement)*;
-    
-    
-    
-    
+
+TargetEnum :
+	"AutoIt" | "WinForms" | "Both"
+;
+
 GUIElement:
     TextLabel | InputField | Button | RadioButton | CheckBox;
 

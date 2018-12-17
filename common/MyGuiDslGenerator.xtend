@@ -37,7 +37,7 @@ class MyGuiDslGenerator extends AbstractGenerator {
             }
 			if(isCS) {
 				fsa.generateFile("genGUI_" + fqn + ".cs", g.compile_cs)
-				fsa.generateFile("callbacks_" + fqn + ".cs", "hallo")
+				fsa.generateFile("callbacks_" + fqn + ".cs", g.createCallbacks_cs)
 			}
         }
 	}
@@ -72,7 +72,7 @@ class MyGuiDslGenerator extends AbstractGenerator {
 				Exit
 	
 	«FOR e : g.guiObjects»«
-		IF e instanceof InputField»«ELSE»		Case $«e.name»
+		IF(e.type == GUIElementType.INPUT_FIELD)»«ELSE»		Case $«e.name»
 				_«e.name»Func()
 	«ENDIF»«ENDFOR»
 	
@@ -88,43 +88,41 @@ class MyGuiDslGenerator extends AbstractGenerator {
 	«ENDFOR»EndFunc
 	'''
 	//create GUIElements in initGUI
-	def compile(GUIElement gE) '''«switch gE {
-	TextLabel:   _initGUI_TextLabel(gE)
-	InputField:  _initGUI_InputField(gE)
-	Button:      _initGUI_Button(gE)
-	RadioButton: _initGUI_RadioButton(gE)
-	CheckBox:    _initGUI_CheckBox(gE)
+	def compile(GUIElement gE) '''«switch gE.type {
+	case TEXT_LABEL:   _initGUI_TextLabel(gE)
+	case INPUT_FIELD:  _initGUI_InputField(gE)
+	case BUTTON:      _initGUI_Button(gE)
+	case RADIO_BUTTON: _initGUI_RadioButton(gE)
+	case CHECK_BOX:    _initGUI_CheckBox(gE)
 	default: 'ERROR'
 	}»'''
 	
-	
 	def String _initGUI_TextLabel(GUIElement gE){
-		val d = (gE as TextLabel).description
+		val d = gE;//(gE as TextLabel).description
 		return "$" + gE.name + " = GUICtrlCreateLabel(\"" + d.text + "\", " + d.left + ", " + d.top + optionalWidthHeight(d) + ")"
 	}
 	
-	
 	def String _initGUI_InputField(GUIElement gE){
-		val d = (gE as InputField).description
+		val d = gE;//(gE as InputField).description
 		return "$" + gE.name + " = GUICtrlCreateInput(\"" + d.text + "\", " + d.left + ", " + d.top + optionalWidthHeight(d) + ")"
 	}
 	
 	def String _initGUI_Button(GUIElement gE){
-		val d = (gE as Button).description
+		val d = gE;//(gE as Button).description
 		return "$" + gE.name + " = GUICtrlCreateButton(\"" + d.text + "\", " + d.left + ", " + d.top + optionalWidthHeight(d) + ")"
 	}
 	
 	def String _initGUI_RadioButton(GUIElement gE){
-		val d = (gE as RadioButton).description
+		val d = gE;//(gE as RadioButton).description
 		return "$" + gE.name + " = GUICtrlCreateRadio(\"" + d.text + "\", " + d.left + ", " + d.top + optionalWidthHeight(d) + ")"
 	}
 	
 	def String _initGUI_CheckBox(GUIElement gE){
-		val d = (gE as CheckBox).description
+		val d = gE;//(gE as CheckBox).description
 		return "$" + gE.name + " = GUICtrlCreateCheckbox(\"" + d.text + "\", " + d.left + ", " + d.top + optionalWidthHeight(d) + ")"
 	}
 	
-	def String optionalWidthHeight(GUIElementDescription gED){
+	def String optionalWidthHeight(GUIElement gED){
 		var ret = ""
 		
 		if((gED.width == 0)&&(gED.height == 0)){
@@ -139,34 +137,6 @@ class MyGuiDslGenerator extends AbstractGenerator {
 		ret
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	//===================================Callbacks==========================================================================
 
 	def callbacks(Gui g) '''
@@ -174,7 +144,7 @@ class MyGuiDslGenerator extends AbstractGenerator {
 	#include "«guiFileName»"
 	
 	«FOR e : g.guiObjects»«
-			IF e instanceof InputField»«ELSE»Func _«e.name»Func()
+			IF e.type == GUIElementType.INPUT_FIELD»«ELSE»Func _«e.name»Func()
 		MsgBox($MB_SYSTEMMODAL, "«e.name»", "«e.name»")
 	EndFunc
 	
@@ -182,10 +152,24 @@ class MyGuiDslGenerator extends AbstractGenerator {
 	'''
 
 
-//--------------------------------
+//------------------------------------------------------------
+// -------- C#
 
+// BEFORE ''
+// (INDENT TEXT SEPERATOR '' NEWLINE)*
+// AFTER ''
 
-	def compile_cs(Gui g) '''
+	def compile_cs(Gui g)'''
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
 namespace «g.fullyQualifiedName» {
 	partial class «g.name» {
 		/// <summary>
@@ -212,12 +196,12 @@ namespace «g.fullyQualifiedName» {
 		/// </summary>
 		private void InitializeComponent() {
 «««			/// Initializer seperate to allow them referencing each other.
-			«FOR e : g.guiObjects SEPARATOR '\n' AFTER '\n'»
-				this.«e.name» = new System.Windows.Forms.«e.fullyQualifiedName» ();
+			«FOR e : g.guiObjects »
+			this.«e.name» = new System.Windows.Forms.«e.type»();
 			«ENDFOR»
 			this.SuspendLayout();
-			«FOR e : g.guiObjects SEPARATOR '\n' AFTER '\n'»
-				«e.createMember_cs(e.description)»
+			«FOR e : g.guiObjects »
+			«e.createMember_cs»
 			«ENDFOR»
 «««			/// Outsourced for convenience, but I guess this can be moved into her as well.
 			«g.createGUI»
@@ -227,13 +211,13 @@ namespace «g.fullyQualifiedName» {
 
 		#endregion
 
-		«FOR e : g.guiObjects SEPARATOR '\n\t\t' AFTER '\n'»
-			private System.Windows.Forms.«e.fullyQualifiedName» «e.name»;
+		«FOR e : g.guiObjects»
+			private System.Windows.Forms.«e.type» «e.name»;
 		«ENDFOR»
 	}
 }'''
 
-def createMember_cs(GUIElement e, GUIElementDescription gd) '''//{
+def createMember_cs(GUIElement e) '''
 // 
 // «e.name»
 // 
@@ -242,15 +226,15 @@ this.«e.name».AutoSize = true;
 «««	// Button, TextBox, RadioButton, Label, CheckBox (this is required, I think)
 this.«e.name».Name = "«e.name»";
 «««	// Button, TextBox, RadioButton, Label, CheckBox
-this.«e.name».Location = new System.Drawing.Point(«gd.left», «gd.top»);
+this.«e.name».Location = new System.Drawing.Point(«e.left», «e.top»);
 «««	// Button, TextBox, RadioButton, Label, CheckBox
 «««		/// Does Size regenerate based on ".Text" if missing?
-this.«e.name».Size = new System.Drawing.Size(«gd.width», «gd.height»);
+this.«e.name».Size = new System.Drawing.Size(«e.width», «e.height»);
 «««	// Button, TextBox, RadioButton, Label, CheckBox
 «««		/// Running number over all elements; Is that really required or implicit from VS?
-//this.«e.name».TabIndex = SEQNO;
+//this.«e.name».TabIndex = 0; // Running Sequence Number
 «««	// Button, RadioButton, Label, CheckBox
-«««	this.«e.name».Text = "«e.display»";
+this.«e.name».Text = "«e.text»";
 «««	// Button, CheckBox
 this.«e.name».UseVisualStyleBackColor = true;
 «««	// Button, RadioButton, CheckBox
@@ -258,7 +242,53 @@ this.«e.name».UseVisualStyleBackColor = true;
 «««		foreach(h in e.handler) do
 «««			this.«e.name».«h.type» += new System.EventHandler(this.«h.name»);
 this.Controls.Add(this.«e.name»);
-'''//} Folding mark1
+'''
+//} Folding mark1
+
+def createCallbacks_cs(Gui g)'''
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace «g.fullyQualifiedName» {
+    public partial class «g.name» : Form {
+        public «g.name»() {
+            InitializeComponent();
+        }
+        
+        public void addCallbacks(Form 1) {
+        	// this.NAME.click += new System.EventHandler(...);
+			«FOR e : g.guiObjects »
+				this.«e.name».click += new System.EventHandler(...)
+			«ENDFOR»
+        }
+		
+		«FOR e : g.guiObjects »
+			«IF e.type == GUIElementType.INPUT_FIELD»
+	        private void «e.name»_Click(object sender, EventArgs e) {
+	            MessageBox.Show("Hello World", "InputBox", MessageBoxButtons.OK, MessageBoxIcon.Information);
+	        }«ELSEIF e.type == GUIElementType.CHECK_BOX»
+	        private void «e.name»_CheckedChanged(object sender, EventArgs e) {
+	            var chk = (CheckBox) sender;
+	            if (chk.Checked)
+	                MessageBox.Show("Checked", "InputBox", MessageBoxButtons.OK, MessageBoxIcon.Information);
+	            else
+	                MessageBox.Show("Unchecked", "InputBox", MessageBoxButtons.OK, MessageBoxIcon.Information);
+	        }«ELSEIF e.type == GUIElementType.RADIO_BUTTON»
+	        private void «e.name»_CheckedChanged(object sender, EventArgs e) {
+	            var rad = (RadioButton) sender;
+	            if (!rad.Checked) return;
+	            MessageBox.Show(rad.Text, "InputBox", MessageBoxButtons.OK, MessageBoxIcon.Information);
+	        }«ENDIF»
+		«ENDFOR»
+    }
+}'''
 
 /* Define Member "e" as
 --	name    :str: VariableName >> default: ToLowercase(class) + SEQNO
@@ -272,7 +302,7 @@ this.Controls.Add(this.«e.name»);
 --	parent  :GuiElement: Parent Element >> default: GUI-Root (??)
 //*/
 
-def createGUI(Gui g)'''«««//{ Folding mark
+def createGUI(Gui g)'''
 // 
 // «g.name»
 // 
@@ -293,7 +323,7 @@ this.Text = "«g.name»";
 «««	--	name    :str: Title of Window
 «««	--	width   :int: Size in X-Direction >> default 300 (?)
 «««	--	height  :int: Size in Y-Direction >> default 300 (?)
-'''//}
+'''
 
 
 

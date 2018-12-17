@@ -8,8 +8,8 @@ import org.eclipse.emf.ecore.EObject
 import org.eclipse.xtext.nodemodel.INode
 import org.eclipse.xtext.conversion.ValueConverterException
 import gui_proj.myGuiDsl.*
-import gui_proj.myGuiDsl.impl.TextLabelImpl
-import gui_proj.myGuiDsl.impl.InputFieldImpl
+//import gui_proj.myGuiDsl.impl.TextLabelImpl
+//import gui_proj.myGuiDsl.impl.InputFieldImpl
 import org.eclipse.emf.ecore.EClassifier
 
 class MyDefaultEcoreElementFactory extends DefaultEcoreElementFactory {
@@ -30,16 +30,17 @@ class MyDefaultEcoreElementFactory extends DefaultEcoreElementFactory {
     override set(EObject object, String feature, Object value, String ruleName, INode node) throws ValueConverterException {
 		println("EObject: " + object.toString)
 		print("> Feature: " + feature)
-		print("\t = " + value.toString)
+		print("\t = " + value?.toString)
 		println("\t// Rulename: " + ruleName)
     	if (object instanceof GUIElement){
     		println("I'm a GUIElement!")
 	    	var newVal = value
 	    	if (feature == "name") {
-		    	switch(object) {
+	    		
+	    		/*switch(object) {
 		    		TextLabel: newVal = "NewName"
 		    		InputField: newVal = "Text"
-		    	}
+		    	} */
 		    	if(newVal != value)
 	    			println(">> New Value: " + newVal)
 	    	}

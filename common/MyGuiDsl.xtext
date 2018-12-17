@@ -4,56 +4,22 @@ generate myGuiDsl "http://www.MyGuiDsl.gui_proj"
 
 Gui :
     "GUI" name=ID
-    "Target" target=TargetEnum
+    "Target" target=("AutoIt" | "WinForms" | "Both")//TargetEnum
     "Titel" titel=STRING
-    "Width" width=INT
     "Heigth" height=INT
+    "Width" width=INT
     (guiObjects+=GUIElement)*;
+    
+enum TARGET_ENUM : AutoIt | WinForms | Both ;
 
-TargetEnum :
-	"AutoIt" | "WinForms" | "Both"
-;
+enum GUIElementType:
+	TextLabel | InputField | Button | RadioButton | CheckBox;
 
 GUIElement:
-    TextLabel | InputField | Button | RadioButton | CheckBox;
-
-
-
-GUIElementDescription:
+	type=(GUIElementType) name=ID '{'
         "text" text=STRING
         "left" left=INT
         "top" top=INT
         ("width" width=INT)?
-        ("height" height=INT)?;
-        
-
-TextLabel:
-	'TextLabel' name=ID '{'
-		(description=GUIElementDescription)
-	'}';
-	
-	
-InputField:
-	'InputField' name=ID '{'
-		description=GUIElementDescription
-	'}';
-Button:
-	'Button' name=ID '{'
-		description=GUIElementDescription
-	'}';
-RadioButton:
-	'RadioButton' name=ID '{'
-		description=GUIElementDescription
-	'}';
-CheckBox:
-	'CheckBox' name=ID '{'
-		description=GUIElementDescription
-	'}';
-		
-		
-		
-		
-		
-		
-		
-		
+        ("height" height=INT)?
+    '}';

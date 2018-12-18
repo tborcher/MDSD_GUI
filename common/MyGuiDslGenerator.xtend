@@ -32,8 +32,8 @@ class MyGuiDslGenerator extends AbstractGenerator {
 			if(isA3) {
 				guiFileName = "genGUI_" + g.fullyQualifiedName.toString("/") + ".au3"//why fullyqulified name? g.name geht auch?
 				callbacksFileName = "callbacks_" + g.fullyQualifiedName.toString("/") + ".au3"
-				fsa.generateFile(guiFileName,g.compile)
-				fsa.generateFile(callbacksFileName, callbacks(g))
+				fsa.generateFile(guiFileName,g.compile_A3)
+				fsa.generateFile(callbacksFileName, g.createCallbacks_A3)
             }
 			if(isCS) {
 				fsa.generateFile("genGUI_" + fqn + ".cs", g.compile_cs)
@@ -44,7 +44,7 @@ class MyGuiDslGenerator extends AbstractGenerator {
 	
 	
 	
-	def compile(Gui g) ''' 
+	def compile_A3(Gui g) ''' 
 	#Region include
 	;~ general
 	#include <GUIConstantsEx.au3>
@@ -84,43 +84,19 @@ class MyGuiDslGenerator extends AbstractGenerator {
 	
 	Func _initGUI()
 		$«g.name» = GUICreate("«g.titel»", «g.width», «g.height»)
-	«FOR e : g.guiObjects»	«e.compile»
+	«FOR e : g.guiObjects»	«e.compile_gE»
 	«ENDFOR»EndFunc
 	'''
 	//create GUIElements in initGUI
-	def compile(GUIElement gE) '''«switch gE.type {
-	case TEXT_LABEL:   _initGUI_TextLabel(gE)
-	case INPUT_FIELD:  _initGUI_InputField(gE)
-	case BUTTON:      _initGUI_Button(gE)
-	case RADIO_BUTTON: _initGUI_RadioButton(gE)
-	case CHECK_BOX:    _initGUI_CheckBox(gE)
+	def compile_gE(GUIElement gE) '''«switch gE.type {
+	case TEXT_LABEL:   "$" + gE.name + " = GUICtrlCreateLabel(\"" + gE.text + "\", " + gE.left + ", " + gE.top + optionalWidthHeight(gE) + ")"
+	case INPUT_FIELD:  "$" + gE.name + " = GUICtrlCreateInput(\"" + gE.text + "\", " + gE.left + ", " + gE.top + optionalWidthHeight(gE) + ")"
+	case BUTTON:       "$" + gE.name + " = GUICtrlCreateButton(\"" + gE.text + "\", " + gE.left + ", " + gE.top + optionalWidthHeight(gE) + ")"
+	case RADIO_BUTTON: "$" + gE.name + " = GUICtrlCreateRadio(\"" + gE.text + "\", " + gE.left + ", " + gE.top + optionalWidthHeight(gE) + ")"
+	case CHECK_BOX:    "$" + gE.name + " = GUICtrlCreateCheckbox(\"" + gE.text + "\", " + gE.left + ", " + gE.top + optionalWidthHeight(gE) + ")"
 	default: 'ERROR'
 	}»'''
 	
-	def String _initGUI_TextLabel(GUIElement gE){
-		val d = gE;//(gE as TextLabel).description
-		return "$" + gE.name + " = GUICtrlCreateLabel(\"" + d.text + "\", " + d.left + ", " + d.top + optionalWidthHeight(d) + ")"
-	}
-	
-	def String _initGUI_InputField(GUIElement gE){
-		val d = gE;//(gE as InputField).description
-		return "$" + gE.name + " = GUICtrlCreateInput(\"" + d.text + "\", " + d.left + ", " + d.top + optionalWidthHeight(d) + ")"
-	}
-	
-	def String _initGUI_Button(GUIElement gE){
-		val d = gE;//(gE as Button).description
-		return "$" + gE.name + " = GUICtrlCreateButton(\"" + d.text + "\", " + d.left + ", " + d.top + optionalWidthHeight(d) + ")"
-	}
-	
-	def String _initGUI_RadioButton(GUIElement gE){
-		val d = gE;//(gE as RadioButton).description
-		return "$" + gE.name + " = GUICtrlCreateRadio(\"" + d.text + "\", " + d.left + ", " + d.top + optionalWidthHeight(d) + ")"
-	}
-	
-	def String _initGUI_CheckBox(GUIElement gE){
-		val d = gE;//(gE as CheckBox).description
-		return "$" + gE.name + " = GUICtrlCreateCheckbox(\"" + d.text + "\", " + d.left + ", " + d.top + optionalWidthHeight(d) + ")"
-	}
 	
 	def String optionalWidthHeight(GUIElement gED){
 		var ret = ""
@@ -137,9 +113,8 @@ class MyGuiDslGenerator extends AbstractGenerator {
 		ret
 	}
 	
-	//===================================Callbacks==========================================================================
-
-	def callbacks(Gui g) '''
+//===================================Callbacks A3=========================================
+	def createCallbacks_A3(Gui g) '''
 	#include <MsgBoxConstants.au3>
 	#include "«guiFileName»"
 	
@@ -150,6 +125,9 @@ class MyGuiDslGenerator extends AbstractGenerator {
 	
 	«ENDIF»«ENDFOR»
 	'''
+//===================================END Callbacks A3=========================================
+
+
 
 
 //------------------------------------------------------------

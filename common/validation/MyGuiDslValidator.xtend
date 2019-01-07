@@ -28,13 +28,18 @@ class MyGuiDslValidator extends AbstractMyGuiDslValidator {
 
     @Check
     def void checkGUIElementNameIsUnique(GUIElement gE) {
+    	var flag = false
         var superGUI = (gE.eContainer as Gui)
-        while (superGUI !== null) {
+        if (superGUI !== null) {
             for (other : superGUI.guiObjects) {
                 if (gE.name == other.name) {
+                	if (flag) {
                     error("GUIElement names have to be unique",
                         MyGuiDslPackage.Literals.GUI_ELEMENT__NAME)
                     return
+                    
+                    }
+                    flag = true
                 }
             }
         }

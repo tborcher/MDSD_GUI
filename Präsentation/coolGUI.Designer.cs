@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace coolGUI {
+namespace ns_coolGUI {
 	partial class coolGUI {
 		/// <summary>
 		/// Erforderliche Designervariable.
@@ -18,7 +18,7 @@ namespace coolGUI {
 		/// <summary>
 		/// Verwendete Ressourcen bereinigen.
 		/// </summary>
-		/// <param name="disposing">True, wenn verwaltete Ressourcen gelöscht werden sollen; andernfalls False.</param>
+		/// <param name="disposing">True, wenn verwaltete Ressourcen gel?scht werden sollen; andernfalls False.</param>
 		protected override void Dispose(bool disposing) {
 			if (disposing && (components != null)) {
 				components.Dispose();
@@ -29,15 +29,15 @@ namespace coolGUI {
 		#region Vom Windows Form-Designer generierter Code
 
 		/// <summary>
-		/// Erforderliche Methode für die Designerunterstützung.
-		/// Der Inhalt der Methode darf nicht mit dem Code-Editor geändert werden.
+		/// Erforderliche Methode f?r die Designerunterst?tzung.
+		/// Der Inhalt der Methode darf nicht mit dem Code-Editor ge?ndert werden.
 		/// </summary>
 		private void InitializeComponent() {
 			this.myButton1 = new System.Windows.Forms.Button();
 			this.myButton2 = new System.Windows.Forms.Button();
-			this.myLabel1 = new System.Windows.Forms.TextLabel();
+			this.myLabel1 = new System.Windows.Forms.Label();
 			this.myCheckBox = new System.Windows.Forms.CheckBox();
-			this.myInput1 = new System.Windows.Forms.InputField();
+			this.myInput1 = new System.Windows.Forms.TextBox();
 			this.myRB1 = new System.Windows.Forms.RadioButton();
 			this.myRB2 = new System.Windows.Forms.RadioButton();
 			this.myRB3 = new System.Windows.Forms.RadioButton();
@@ -49,9 +49,8 @@ namespace coolGUI {
 			this.myButton1.Name = "myButton1";
 			this.myButton1.Location = new System.Drawing.Point(10, 180);
 			this.myButton1.Size = new System.Drawing.Size(0, 0);
-			//this.myButton1.TabIndex = 0; // Running Sequence Number
+			this.myButton1.TabIndex = 0;
 			this.myButton1.Text = "Button 1";
-			this.myButton1.UseVisualStyleBackColor = true;
 			this.Controls.Add(this.myButton1);
 			// 
 			// myButton2
@@ -60,9 +59,8 @@ namespace coolGUI {
 			this.myButton2.Name = "myButton2";
 			this.myButton2.Location = new System.Drawing.Point(80, 180);
 			this.myButton2.Size = new System.Drawing.Size(0, 0);
-			//this.myButton2.TabIndex = 0; // Running Sequence Number
+			this.myButton2.TabIndex = 1;
 			this.myButton2.Text = "Button 2";
-			this.myButton2.UseVisualStyleBackColor = true;
 			this.Controls.Add(this.myButton2);
 			// 
 			// myLabel1
@@ -71,9 +69,8 @@ namespace coolGUI {
 			this.myLabel1.Name = "myLabel1";
 			this.myLabel1.Location = new System.Drawing.Point(10, 10);
 			this.myLabel1.Size = new System.Drawing.Size(0, 0);
-			//this.myLabel1.TabIndex = 0; // Running Sequence Number
+			this.myLabel1.TabIndex = 2;
 			this.myLabel1.Text = "Das ist eine Test GUI";
-			this.myLabel1.UseVisualStyleBackColor = true;
 			this.Controls.Add(this.myLabel1);
 			// 
 			// myCheckBox
@@ -82,9 +79,8 @@ namespace coolGUI {
 			this.myCheckBox.Name = "myCheckBox";
 			this.myCheckBox.Location = new System.Drawing.Point(10, 50);
 			this.myCheckBox.Size = new System.Drawing.Size(0, 0);
-			//this.myCheckBox.TabIndex = 0; // Running Sequence Number
+			this.myCheckBox.TabIndex = 3;
 			this.myCheckBox.Text = "Check Mich";
-			this.myCheckBox.UseVisualStyleBackColor = true;
 			this.Controls.Add(this.myCheckBox);
 			// 
 			// myInput1
@@ -93,9 +89,8 @@ namespace coolGUI {
 			this.myInput1.Name = "myInput1";
 			this.myInput1.Location = new System.Drawing.Point(10, 80);
 			this.myInput1.Size = new System.Drawing.Size(0, 0);
-			//this.myInput1.TabIndex = 0; // Running Sequence Number
+			this.myInput1.TabIndex = 4;
 			this.myInput1.Text = "Schreib was";
-			this.myInput1.UseVisualStyleBackColor = true;
 			this.Controls.Add(this.myInput1);
 			// 
 			// myRB1
@@ -104,9 +99,8 @@ namespace coolGUI {
 			this.myRB1.Name = "myRB1";
 			this.myRB1.Location = new System.Drawing.Point(10, 110);
 			this.myRB1.Size = new System.Drawing.Size(0, 0);
-			//this.myRB1.TabIndex = 0; // Running Sequence Number
+			this.myRB1.TabIndex = 5;
 			this.myRB1.Text = "1";
-			this.myRB1.UseVisualStyleBackColor = true;
 			this.Controls.Add(this.myRB1);
 			// 
 			// myRB2
@@ -115,9 +109,8 @@ namespace coolGUI {
 			this.myRB2.Name = "myRB2";
 			this.myRB2.Location = new System.Drawing.Point(10, 130);
 			this.myRB2.Size = new System.Drawing.Size(0, 0);
-			//this.myRB2.TabIndex = 0; // Running Sequence Number
+			this.myRB2.TabIndex = 6;
 			this.myRB2.Text = "2";
-			this.myRB2.UseVisualStyleBackColor = true;
 			this.Controls.Add(this.myRB2);
 			// 
 			// myRB3
@@ -126,9 +119,8 @@ namespace coolGUI {
 			this.myRB3.Name = "myRB3";
 			this.myRB3.Location = new System.Drawing.Point(10, 150);
 			this.myRB3.Size = new System.Drawing.Size(0, 0);
-			//this.myRB3.TabIndex = 0; // Running Sequence Number
+			this.myRB3.TabIndex = 7;
 			this.myRB3.Text = "3";
-			this.myRB3.UseVisualStyleBackColor = true;
 			this.Controls.Add(this.myRB3);
 			// 
 			// coolGUI
@@ -140,6 +132,7 @@ namespace coolGUI {
 			this.Location = new System.Drawing.Point(200, 200);
 			this.Name = "coolGUI";
 			this.Text = "coolGUI";
+			addCallbacks();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 		}
@@ -148,9 +141,9 @@ namespace coolGUI {
 
 		private System.Windows.Forms.Button myButton1;
 		private System.Windows.Forms.Button myButton2;
-		private System.Windows.Forms.TextLabel myLabel1;
+		private System.Windows.Forms.Label myLabel1;
 		private System.Windows.Forms.CheckBox myCheckBox;
-		private System.Windows.Forms.InputField myInput1;
+		private System.Windows.Forms.TextBox myInput1;
 		private System.Windows.Forms.RadioButton myRB1;
 		private System.Windows.Forms.RadioButton myRB2;
 		private System.Windows.Forms.RadioButton myRB3;

@@ -30,14 +30,15 @@ class MyGuiDslGenerator extends AbstractGenerator {
 			var isA3 = g.target == "AutoIt" || g.target == "Both"
 			var fqn = g.fullyQualifiedName.toString("/")
 			if(isA3) {
-				guiFileName = "genGUI_" + g.fullyQualifiedName.toString("/") + ".au3"//why fullyqulified name? g.name geht auch?
+				guiFileName = "genGUI_" + g.fullyQualifiedName.toString("/") + ".au3"
 				callbacksFileName = "callbacks_" + g.fullyQualifiedName.toString("/") + ".au3"
 				fsa.generateFile(guiFileName,g.compile_A3)
 				fsa.generateFile(callbacksFileName, g.createCallbacks_A3)
             }
 			if(isCS) {
-				fsa.generateFile("genGUI_" + fqn + ".cs", g.compile_cs)
-				fsa.generateFile("callbacks_" + fqn + ".cs", g.createCallbacks_cs)
+				fsa.generateFile(fqn + ".Designer.cs", g.compile_cs)
+				fsa.generateFile(fqn + ".cs", g.createCallbacks_cs)
+				fsa.generateFile("Program.cs", g.createMain_cs)
 			}
         }
 	}
@@ -137,7 +138,7 @@ class MyGuiDslGenerator extends AbstractGenerator {
 // (INDENT TEXT SEPERATOR '' NEWLINE)*
 // AFTER ''
 
-	def compile_cs(Gui g)'''
+def compile_cs(Gui g)'''
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -148,7 +149,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace «g.fullyQualifiedName» {
+namespace ns_«g.fullyQualifiedName» {
 	partial class «g.name» {
 		/// <summary>
 		/// Erforderliche Designervariable.
@@ -175,7 +176,7 @@ namespace «g.fullyQualifiedName» {
 		private void InitializeComponent() {
 «««			/// Initializer seperate to allow them referencing each other.
 			«FOR e : g.guiObjects »
-			this.«e.name» = new System.Windows.Forms.«e.type»();
+			this.«e.name» = new System.Windows.Forms.«createMemberType_cs(e.type)»();
 			«ENDFOR»
 			this.SuspendLayout();
 			«FOR e : g.guiObjects »
@@ -183,6 +184,7 @@ namespace «g.fullyQualifiedName» {
 			«ENDFOR»
 «««			/// Outsourced for convenience, but I guess this can be moved into her as well.
 			«g.createGUI»
+			addCallbacks();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 		}
@@ -190,10 +192,23 @@ namespace «g.fullyQualifiedName» {
 		#endregion
 
 		«FOR e : g.guiObjects»
-			private System.Windows.Forms.«e.type» «e.name»;
+			private System.Windows.Forms.«createMemberType_cs(e.type)» «e.name»;
 		«ENDFOR»
 	}
 }'''
+
+var seqNum = 0
+
+def createMemberType_cs(GUIElementType type) {
+	switch type {
+		case TEXT_LABEL:  return "Label"
+		case INPUT_FIELD:  return "TextBox"
+		case BUTTON:       return "Button"
+		case RADIO_BUTTON: return "RadioButton"
+		case CHECK_BOX:    return "CheckBox"
+		default: 'ERROR'
+	}
+}
 
 def createMember_cs(GUIElement e) '''
 // 
@@ -210,76 +225,17 @@ this.«e.name».Location = new System.Drawing.Point(«e.left», «e.top»);
 this.«e.name».Size = new System.Drawing.Size(«e.width», «e.height»);
 «««	// Button, TextBox, RadioButton, Label, CheckBox
 «««		/// Running number over all elements; Is that really required or implicit from VS?
-//this.«e.name».TabIndex = 0; // Running Sequence Number
+this.«e.name».TabIndex = «seqNum++»;
 «««	// Button, RadioButton, Label, CheckBox
 this.«e.name».Text = "«e.text»";
-«««	// Button, CheckBox
-this.«e.name».UseVisualStyleBackColor = true;
+«««	// Button, CheckBox (defaults to true)
+«««//this.«e.name».UseVisualStyleBackColor = true;
 «««	// Button, RadioButton, CheckBox
 «««	if e.hasHandler then
 «««		foreach(h in e.handler) do
 «««			this.«e.name».«h.type» += new System.EventHandler(this.«h.name»);
 this.Controls.Add(this.«e.name»);
 '''
-//} Folding mark1
-
-def createCallbacks_cs(Gui g)'''
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-
-namespace «g.fullyQualifiedName» {
-    public partial class «g.name» : Form {
-        public «g.name»() {
-            InitializeComponent();
-        }
-        
-        public void addCallbacks(Form 1) {
-        	// this.NAME.click += new System.EventHandler(...);
-			«FOR e : g.guiObjects »
-				this.«e.name».click += new System.EventHandler(...)
-			«ENDFOR»
-        }
-		
-		«FOR e : g.guiObjects »
-			«IF e.type == GUIElementType.INPUT_FIELD»
-	        private void «e.name»_Click(object sender, EventArgs e) {
-	            MessageBox.Show("Hello World", "InputBox", MessageBoxButtons.OK, MessageBoxIcon.Information);
-	        }«ELSEIF e.type == GUIElementType.CHECK_BOX»
-	        private void «e.name»_CheckedChanged(object sender, EventArgs e) {
-	            var chk = (CheckBox) sender;
-	            if (chk.Checked)
-	                MessageBox.Show("Checked", "InputBox", MessageBoxButtons.OK, MessageBoxIcon.Information);
-	            else
-	                MessageBox.Show("Unchecked", "InputBox", MessageBoxButtons.OK, MessageBoxIcon.Information);
-	        }«ELSEIF e.type == GUIElementType.RADIO_BUTTON»
-	        private void «e.name»_CheckedChanged(object sender, EventArgs e) {
-	            var rad = (RadioButton) sender;
-	            if (!rad.Checked) return;
-	            MessageBox.Show(rad.Text, "InputBox", MessageBoxButtons.OK, MessageBoxIcon.Information);
-	        }«ENDIF»
-		«ENDFOR»
-    }
-}'''
-
-/* Define Member "e" as
---	name    :str: VariableName >> default: ToLowercase(class) + SEQNO
---	class   :str: Button	or	System.Windows.Forms.Button, if using does not work.
---	left    :int: Position in px from left border
---	top     :int: Position in px from top border
---	width   :int: Size in X-Direction
---	height  :int: Size in Y-Direction >> default seems to be 17
---	display :str: Text to be displayed >> default: $name (if no sideeffects) or null (if the case)
---	handler :xxx: Collection of Callbacks >> default: null
---	parent  :GuiElement: Parent Element >> default: GUI-Root (??)
-//*/
-
 def createGUI(Gui g)'''
 // 
 // «g.name»
@@ -302,8 +258,90 @@ this.Text = "«g.name»";
 «««	--	width   :int: Size in X-Direction >> default 300 (?)
 «««	--	height  :int: Size in Y-Direction >> default 300 (?)
 '''
+//} Folding mark1
 
+def createCallbacks_cs(Gui g)'''
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 
+namespace ns_«g.fullyQualifiedName» {
+	public partial class «g.name» : Form {
+		public «g.name»() {
+			InitializeComponent();
+		}
+		
+		public void addCallbacks() {
+			«FOR e : g.guiObjects »
+				«IF e.type == GUIElementType.BUTTON»
+				this.«e.name».Click += new System.EventHandler(this.«e.name»_Click);
+				«ELSEIF e.type == GUIElementType.CHECK_BOX»
+				this.«e.name».CheckedChanged += new System.EventHandler(this.«e.name»_CheckedChanged);
+				«ELSEIF e.type == GUIElementType.RADIO_BUTTON»
+				this.«e.name».CheckedChanged += new System.EventHandler(this.«e.name»_CheckedChanged);
+				«ENDIF»
+			«ENDFOR»
+		}
+		
+		«FOR e : g.guiObjects »
+			«IF e.type == GUIElementType.BUTTON»
+			private void «e.name»_Click(object sender, EventArgs e) {
+				MessageBox.Show("Hello World von «e.text»", "InputBox", MessageBoxButtons.OK, MessageBoxIcon.Information);
+			}«ELSEIF e.type == GUIElementType.CHECK_BOX»
+			private void «e.name»_CheckedChanged(object sender, EventArgs e) {
+				var chk = (CheckBox) sender;
+				if (chk.Checked)
+					MessageBox.Show("Checked", "InputBox", MessageBoxButtons.OK, MessageBoxIcon.Information);
+				else
+					MessageBox.Show("Unchecked", "InputBox", MessageBoxButtons.OK, MessageBoxIcon.Information);
+			}«ELSEIF e.type == GUIElementType.RADIO_BUTTON»
+			private void «e.name»_CheckedChanged(object sender, EventArgs e) {
+				var rad = (RadioButton) sender;
+				if (!rad.Checked) return;
+				MessageBox.Show(rad.Text, "InputBox", MessageBoxButtons.OK, MessageBoxIcon.Information);
+			}«ENDIF»
+		«ENDFOR»
+	}
+}'''
+/* Define Member "e" as
+--	name    :str: VariableName >> default: ToLowercase(class) + SEQNO
+--	class   :str: Button	or	System.Windows.Forms.Button, if using does not work.
+--	left    :int: Position in px from left border
+--	top     :int: Position in px from top border
+--	width   :int: Size in X-Direction
+--	height  :int: Size in Y-Direction >> default seems to be 17
+--	display :str: Text to be displayed >> default: $name (if no sideeffects) or null (if the case)
+--	handler :xxx: Collection of Callbacks >> default: null
+--	parent  :GuiElement: Parent Element >> default: GUI-Root (??)
+//*/
+
+def createMain_cs(Gui g)'''
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace ns_«g.fullyQualifiedName» {
+	static class Program {
+		/// <summary>
+		/// Der Haupteinstiegspunkt für die Anwendung.
+		/// </summary>
+		[STAThread]
+		static void Main() {
+			Application.EnableVisualStyles();
+			Application.SetCompatibleTextRenderingDefault(false);
+			Application.Run(new «g.name»());
+		}
+	}
+}'''
 
 }
 

@@ -7,6 +7,10 @@ import org.eclipse.xtext.validation.Check
 import gui_proj.myGuiDsl.GUIElement
 import gui_proj.myGuiDsl.Gui
 import gui_proj.myGuiDsl.MyGuiDslPackage
+import java.util.Map
+import java.util.HashMap
+import gui_proj.myGuiDsl.GUIElementType
+import java.text.MessageFormat
 
 /**
  * This class contains custom validation rules. 
@@ -45,4 +49,35 @@ class MyGuiDslValidator extends AbstractMyGuiDslValidator {
         }
     }
 	
+	@Check
+    def void checkGUINumberOfElements2(GUIElement elem) {
+    	var limit = 5
+    	var map = new HashMap<GUIElementType, Integer>()
+    	
+        var superGUI = (elem.eContainer as Gui)
+        if (superGUI !== null) {
+            for (gE : superGUI.guiObjects) {
+	        	var num = map.putIfAbsent(gE.type, 0)
+        		if(num === null) num = 1 else num++
+	        	map.put(gE.type,num)
+	        	if(gE.name == elem.name) {
+					if(num > limit) {
+						var msg = MessageFormat.format("Too many Elements of Type \"{0}\" ({1} > {2})", gE.type, num, limit)
+						error(msg, MyGuiDslPackage.Literals.GUI_ELEMENT__TYPE)
+					}
+					return
+	        	}
+	        }
+		}
+    }	
+    
+    @Check
+    def void checkGUITotalNumberOfElements(Gui gui) {
+    	var totalLimit = 10
+    	var total = gui.guiObjects.length 
+        if(total > totalLimit) {
+    		var msg = MessageFormat.format("Too many Elements ({0} > {1})", total, totalLimit)
+    		error(msg, MyGuiDslPackage.Literals.GUI__NAME)
+        }
+    }
 }

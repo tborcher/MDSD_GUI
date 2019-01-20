@@ -1,0 +1,45 @@
+GUI coolGUI
+Target Both
+Titel "Fancy GUI"
+Heigth 210
+Width 300
+Button myButton1{
+	text "Button 1"
+	left 10
+	top 180
+}
+Button myButton2{
+	text "Button 2"
+	left 80
+	top 180
+}
+TextLabel myLabel1{
+	text "Das ist eine Test GUI"
+	left 10
+	top 10
+}
+CheckBox myCheckBox{
+	text "Check Mich"
+	left 10
+	top 50
+}
+InputField myInput1 {
+	text "Schreib was"
+	left 10
+	top 80
+}
+RadioButton myRB1{
+	text "1"
+	left 10
+	top 110
+}
+RadioButton myRB2{
+	text "2"
+	left 10
+	top 130
+}
+RadioButton myRB3{
+	text "3"
+	left 10
+	top 150
+}

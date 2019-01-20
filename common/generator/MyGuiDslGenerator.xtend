@@ -30,15 +30,17 @@ class MyGuiDslGenerator extends AbstractGenerator {
 			var isA3 = g.target == "AutoIt" || g.target == "Both"
 			var fqn = g.fullyQualifiedName.toString("/")
 			if(isA3) {
-				guiFileName = "genGUI_" + g.fullyQualifiedName.toString("/") + ".au3"
-				callbacksFileName = "callbacks_" + g.fullyQualifiedName.toString("/") + ".au3"
+				var prefix = "autoit/"
+				guiFileName = prefix + "genGUI_" + fqn + ".au3"
+				callbacksFileName = prefix + "callbacks_" + fqn + ".au3"
 				fsa.generateFile(guiFileName,g.compile_A3)
 				fsa.generateFile(callbacksFileName, g.createCallbacks_A3)
             }
 			if(isCS) {
-				fsa.generateFile(fqn + ".Designer.cs", g.compile_cs)
-				fsa.generateFile(fqn + ".cs", g.createCallbacks_cs)
-				fsa.generateFile("Program.cs", g.createMain_cs)
+				var prefix = "csharp/"
+				fsa.generateFile(prefix + fqn + ".Designer.cs", g.compile_cs)
+				fsa.generateFile(prefix + fqn + ".cs", g.createCallbacks_cs)
+				fsa.generateFile(prefix + "Program.cs", g.createMain_cs)
 			}
         }
 	}
@@ -214,17 +216,18 @@ def createMember_cs(GUIElement e) '''
 // 
 // «e.name»
 // 
-«««	// Label, CheckBox --> Will discard ".Size" (?)
-this.«e.name».AutoSize = true;
 «««	// Button, TextBox, RadioButton, Label, CheckBox (this is required, I think)
 this.«e.name».Name = "«e.name»";
 «««	// Button, TextBox, RadioButton, Label, CheckBox
 this.«e.name».Location = new System.Drawing.Point(«e.left», «e.top»);
+«IF e.width > 0 || e.height > 0»
 «««	// Button, TextBox, RadioButton, Label, CheckBox
-«««		/// Does Size regenerate based on ".Text" if missing?
 this.«e.name».Size = new System.Drawing.Size(«e.width», «e.height»);
+«ELSE»
+«««	// Label, CheckBox --> Will discard ".Size" scale based on "Text"
+this.«e.name».AutoSize = true;
+«ENDIF»
 «««	// Button, TextBox, RadioButton, Label, CheckBox
-«««		/// Running number over all elements; Is that really required or implicit from VS?
 this.«e.name».TabIndex = «seqNum++»;
 «««	// Button, RadioButton, Label, CheckBox
 this.«e.name».Text = "«e.text»";
